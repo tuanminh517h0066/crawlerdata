@@ -38,28 +38,62 @@ class scrapeProduct extends Command
      */
     public function handle()
     {
-        //
-        $crawler = Goutte::request('GET', 'https://badhabitsstore.vn/collections/hoodie-and-sweater?page=3');
+        
+        $crawler = Goutte::request('GET', 'https://badhabitsstore.vn/');
 
-        $linkProduct = $crawler->filter('div.col-lg-12.col-md-12.col-sm-12.col-xs-12 a.page-node')->each(function ($node) {
-            $a=$node->attr("href");
-            print($a . "\n");
-            //return $node->attr("href");
+        $linkProduct = $crawler->filter('ul.clearfix.clonemenu li a')->each(function ($node) {
+            //$a=$node->attr("href");
+            //print(env("Shop").$a . "\n");
+            return $node->attr("href");
 
-            $b =array($a);
-            print($b);
+            //$b =array($a);
+            //print($b);
 
         });
-        print($linkProduct);
-        //$url = 'http://mende.vn/danh-muc/ao/';
-        //foreach ($linkProduct as $vaule){
-            //print($vaule . "\n");
+        $url1 = env("Shop1").$linkProduct[1];
+        print($url1. "\n");
+        
+        //$bot = new \App\Scraper\phone();
+        //$bot->scrape($url1);
+        
+        
+
+        
+        $crawler1 = Goutte::request('GET', $url1);
+
+        $linkProduct1 = $crawler1->filter('ul.tree-menu.xx li a')->each(function ($node) {
+            $a = $node->attr("href");
+            return env("Shop1").$a;
+            //return $node->attr("href");
+
+            //$b =array($a);
+            //print($b);
             //$bot = new \App\Scraper\phone();
             //$bot->scrape();
-        //}
+
+        });
+        //$url1=$linkProduct[0];
+        //print($url1);
+        //$bot = new \App\Scraper\phone();
+        //$bot->scrape($url1);
+        
+        //$url1=env("Shop1").$linkProduct[1];
+        //print(count($linkProduct)."\n");
+
+        for ($i=0; $i < count($linkProduct1); $i++) { 
+            # code...
+            //print($linkProduct[$i]);
+            $bot = new \App\Scraper\phone();
+            $bot->scrape($linkProduct1[$i]);
+        }
+        
+        
+        
         
     }
-    /*
+
+}
+    /* EXAMPLE SECTION 
     public static function scrapeProduct($url){
         /*
         $crawler = Goutte::request('GET', $url);
@@ -144,4 +178,4 @@ class scrapeProduct extends Command
     }
     */
     
-}
+

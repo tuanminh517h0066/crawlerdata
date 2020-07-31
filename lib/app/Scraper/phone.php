@@ -4,32 +4,29 @@ namespace App\Scraper;
 
 use Goutte\Client;
 use Symfony\Component\DomCrawler\Crawler;
-use App\Product;
+use App\Clothe;
 
 class phone
 {
     
-    public function scrape($url,$id)
+    public function scrape($url)
     {
-        
+        //$url= 'https://badhabitsstore.vn/collections/all';
+        print($url."\n");
+
         $client = new Client();
        
         $crawler1 = $client->request('GET', $url);
-        $GLOBALS['id1']= $id;
+        //$GLOBALS['id1']= $id;
         //print($id1);
-
+        
         try {
             //code...
             //$crawler = Goutte::request('GET', 'https://badhabitsstore.vn/collections/hoodie-and-sweater?page=3');
 
                 $linkProduct = $crawler1->filter('div.col-lg-12.col-md-12.col-sm-12.col-xs-12 a.page-node')->each(function ($node) {
-                //$a=$node->text();
-                //print($a . "\n");
+                
                 return $node->text();
-
-            //$b =array($a);
-            //print($b);
-
             });
             //print($linkProduct[2]);
             $GLOBALS['page']=end($linkProduct);
@@ -44,30 +41,34 @@ class phone
                         
                         $title = $node->filter(' h3.pro-name a')->text();
         
-                        $price = $node->filter('p.pro-price ')->text();
+                        if($node->filter('p.pro-price.highlight ')->count() > 0){
+                            $price = $node->filter('p.pro-price.highlight span.pro-price-del del.compare-price')->text();
+                        }else{
+                            $price = $node->filter('p.pro-price ')->text();
+                        }
                         $thumbnail = $node->filter('img.img-loop')->attr('src');
                         
                         $price = preg_replace('/\D/', '', $price);
-                        $product = new Product;
+                        $product = new Clothe;
                         $thumbnail1= env("Shop").$thumbnail;
         
                         $product->title = $title;
                         $product->price = $price;
                         $product->thumbnail = $thumbnail1;
-                        $product->next_page = $GLOBALS['page'];
-                        $product->header_id = $GLOBALS['id1'];
+                        $product->page = $GLOBALS['page'];
+                        //$product->header_id = $GLOBALS['id1'];
                         //$product->rate = $rate;
                         $product->save();
-                        print("lay du lieu thanh cong"."\n");
+                        print("add data successfully"."\n");
                     }
                 );
             };
+            print("----------------------------------------------------"."\n");
 
-            
-            
         } catch (InvalidArgumentException $e) {
             //throw $th;
         }
+        
         
 
         
